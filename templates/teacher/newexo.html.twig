@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/bootstrap.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="/linedtextarea.css">
+    <script src="/jquery-3.3.1.js"></script>
+    <script src="https://SortableJS.github.io/Sortable/Sortable.js"></script>
+    <script src="/linedtextarea.js"></script>
+    <title>Create an Exercice</title>
+</head>
+<body>
+    <nav class="navbar d-flex align-items-center navbar-dark bg-dark fixed-top">
+        <span class="navbar-brand mr-auto p-2 text-monospace">Parson</span>
+        <div id="info-user" class="text-white-50 p-2" style="margin-right: 10px">Connected as {{ username }}.</div>
+        <a class="btn btn-outline-light my-2 my-sm-0" style="margin-right: 10px" href="/teacher/home">Home</a>
+        <a class="btn btn-outline-danger my-2 my-sm-0" style="margin-right: 10px" href="/logout">Log out</a>
+    </nav> 
+    
+    <div class="container" style="margin-top: 100px;">
+        <h1>Create an Exercice</h1>
+        {% if no_access %}
+            <br>
+            <div class="alert alert-warning" role="alert">
+            Sorry {{username}}, but this course either not exist or is not yours. Come <a href="/teacher/home" class="alert-link">back</a>.
+            </div>
+        {% else %}
+            <p>for <span class="font-weight-bold">{{course.title}}</span></p>
+            <br>
+            {{ form_start(form) }}
+            {{ form_widget(form.title) }}
+            <br>
+            {{ form_widget(form.code) }}
+            <small class="form-text text-muted"> Write your code. (10 rows & 300 char maximum). Please use space for indent.</small>
+            <br>
+            <div id="preview">
+                <h4>Preview</h4>
+                <br>
+                <div id="list" class="list-group" style="font-family: monospace;"></div>
+                <br>
+            </div>
+            {{ form_widget(form.submit, { 'label': 'Add' }) }}
+            {{ form_end(form) }}
+            <br>
+        {% endif %}
+    </div>
+    
+    <script>
+        let preview = function (e) {
+            if ($("#form_code").val().trim() == "") {
+                $("#preview").hide();
+            } else {
+                let lines = $("#form_code").val().split('\n');
+                let c = [];
+                let len;
+                if (lines.length >= 10) {
+                    len = 10;
+                } else {
+                    len = lines.length;
+                }
+                for (let i = 0; i < len; i++) {
+                    if (lines[i].trimLeft().length != 0) {
+                        indent = lines[i].length - lines[i].trimLeft().length;
+                        c[i] = '<li class="list-group-item" style="margin-left: ' + indent/2 + 'em;">';
+                        c[i] += lines[i];
+                        c[i] += '</li>';
+                    }
+                }
+                $("#list").html(c);
+                $("#preview").show();
+            }
+        }
+
+        let hideEmptyPreview = function (e) {
+            if ($("#form_code").val().trim() == "") {
+                $("#preview").hide();
+            }
+        }
+
+        $("#form_code").keyup(preview);
+        $("#form_code").keyup(hideEmptyPreview); 
+        $(document).ready(preview);
+        $(document).ready(hideEmptyPreview);
+
+        Sortable.create(list);
+
+        $(function() {
+            $("#form_code").linedtextarea();
+        });
+    </script>
+</body>
+</html>

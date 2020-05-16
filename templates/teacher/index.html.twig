@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://127.0.0.1:8000/bootstrap.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <title>Home Teacher</title>
+</head>
+<body>
+    <nav class="navbar d-flex align-items-center navbar-dark bg-dark fixed-top">
+        <span class="navbar-brand mr-auto p-2 text-monospace">Parson</span>
+        <div id="info-user" class="text-white-50 p-2" style="margin-right: 10px">Connected as {{ username }}.</div>
+        <a class="btn btn-outline-danger my-2 my-sm-0" style="margin-right: 10px" href="/logout">Log out</a>
+    </nav> 
+    
+    <div class="container" style="margin-top: 100px;">
+        <h1>Home </h1>
+        <br>
+
+        <form class="form-inline" method="post">
+            {{ form_start(form) }}
+            <div class="form-group mb-2">
+                <span class="form-control-plaintext">Create a new course : </span>
+            </div>
+            <div class="form-group mx-sm-3 mb-2">
+                {{form_widget(form.title)}}
+            </div>
+            {{ form_widget(form.submit, { 'label': 'Create' }) }}
+            {{ form_end(form) }}
+        </form>
+
+        <br>
+        <h4>My Courses. </h4>
+        <br>
+
+        {% if courses|length == 0%}
+        <div class="alert alert-info" role="alert">
+        You have no course yet. Why not create one ?
+        </div>
+        {% else %}
+            <ul class="list-group">
+            {% for i in range(0, courses|length - 1) %}
+                 <li class="list-group-item d-flex justify-content-between align-items-center font-weight-light">
+                    <a href="/teacher/course/{{courses[i].id}}" class="text-decoration-none font-weight-light text-body">{{courses[i].title}}</a>
+                    {% if res[i] > 50 %}
+                        <span class="badge badge-success badge-pill">{{ res[i] }} %</span>
+                    {% elseif res[i] == -1 %}
+                        <span class="badge badge-warning badge-pill">No Data</span>
+                    {% elseif res[i] <= 50 %}
+                        <span class="badge badge-primary badge-pill">{{ res[i] }} %</span>
+                    {% endif %}
+                </li>
+            {%endfor%}
+            </ul>
+        {% endif %}
+
+        <br>
+        <form class="form-inline" method="post" action="/teacher/result">
+            <div class="form-group mb-2">
+                <span class="form-control-plaintext">Search a student's result : </span>
+            </div>
+            <div class="form-group mx-sm-3 mb-2">
+                <input type="text" list="usernames" id="form_title" name="username" required="required" class="form-control" placeholder="Username" autocomplete="off" value="">
+                <datalist id="usernames">
+                    {% for user in usernames %}
+                        <option value="{{ user }}">
+                    {% endfor %}
+                </datalist>
+            </div>
+            <button type="submit" class="btn btn-primary mb-2">Search</button>
+        </form>
+    </div>
+    <script src="/jquery-3.3.1.js"></script>
+    <script>
+        let usernames = [
+            {% for user in usernames %}
+                "{{user}}" ,
+            {% endfor %}
+        ];
+
+
+    </script>
+    
+</body>
+</html>

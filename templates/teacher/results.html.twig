@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    {% if exists %}
+        <title>{{ student }}`s results</title>
+    {% else %}
+        <title>Not found</title>
+    {% endif %}
+
+</head>
+<body>
+    <nav class="navbar d-flex align-items-center navbar-dark bg-dark fixed-top">
+        <span class="navbar-brand mr-auto p-2 text-monospace">Parson</span>
+        <div id="info-user" class="text-white-50 p-2" style="margin-right: 10px">Connected as {{ username }}.</div>
+        <a class="btn btn-outline-light my-2 my-sm-0" style="margin-right: 10px" href="/teacher/home">Home</a>
+        <a class="btn btn-outline-danger my-2 my-sm-0" style="margin-right: 10px" href="/logout">Log out</a>
+    </nav> 
+    
+    <div class="container" style="margin-top: 100px;">
+        {% if not exists %}
+            <div class="alert alert-warning" role="alert">
+                Sorry {{username}}, but {{ student }} doesn't exist or is not a student. Come <a href="/teacher/home" class="alert-link">back</a>.
+            </div>
+        {% else %}
+            {% if results|length == 0 %}
+                <div class="alert alert-warning" role="alert">
+                Sorry {{username}}, but {{ student }} didn't made any attempt yet. Come <a href="/teacher/home" class="alert-link">back</a>.
+                </div>
+            {% else %}
+                <h1>Results</h1>
+                <br>
+                <div class="list-group">
+                {% for i in range(0, results|length - 1) %}
+                    <div class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1"> {{results[i].exo}}</h5>
+                            
+                        {% if results[i].succ %}   
+                            <small class="text-success">Succeed</small>
+                        {% else %}
+                            <small class="text-danger">Failed</small>
+                        {% endif %}
+
+                        </div>
+                        <p class="mb-1">from {{results[i].course}}</p>
+                    </div>
+                {% endfor %}
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</body>
+</html>

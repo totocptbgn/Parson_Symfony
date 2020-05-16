@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="/jquery-3.3.1.js"></script>
+    <title>Forbidden Access</title>
+</head>
+<body>
+    <nav class="navbar d-flex align-items-center navbar-dark bg-dark fixed-top">
+        <span class="navbar-brand mr-auto p-2 text-monospace">Parson</span>
+        <a class="btn btn-outline-danger my-2 my-sm-0" style="margin-right: 10px" href="/logout">Log out</a>
+    </nav>
+    <div class="container" style="margin-top: 100px;">
+        <div class="alert alert-warning" role="alert">
+            Sorry {{username}}, but this page is accessible only by {{role}} ! Come back <a href="{{link}}" class="alert-link">here</a> !
+        </div>
+    </div>
+</body>
+</html>

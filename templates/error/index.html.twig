@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <title>Error</title>
+</head>
+<body>
+        <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+        <span class="navbar-brand text-monospace">Parson</span>
+    </nav>
+
+    <div class="container" style="margin-top: 100px;">
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">Error</h4>
+            <p>An internal error happened. Here is the error message :</p>
+            <hr>
+            <p class="mb-0"> {{ error }}</p>
+        </div>
+    </div>
+</body>
+</html>

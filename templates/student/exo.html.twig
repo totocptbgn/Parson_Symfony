@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="/jquery-3.3.1.js"></script>
+    <script src="https://SortableJS.github.io/Sortable/Sortable.js"></script>
+    {% if not exists %}
+    <title>Error - Exo</title>
+    {% else %}
+    <title>{{ exo.title }}</title>
+   {% endif %} 
+</head>
+<body>
+    <nav class="navbar d-flex align-items-center navbar-dark bg-dark fixed-top">
+        <span class="navbar-brand mr-auto p-2 text-monospace">Parson</span>
+        <div id="info-user" class="text-white-50 p-2" style="margin-right: 10px">Connected as {{ username }}.</div>
+        <a class="btn btn-outline-light my-2 my-sm-0" style="margin-right: 10px" href="/student/home">Home</a>
+        <a class="btn btn-outline-danger my-2 my-sm-0" style="margin-right: 10px" href="/logout">Log out</a>
+    </nav> 
+    
+    <div class="container" style="margin-top: 100px;">
+        {% if not exists %}
+            <br>
+            <div class="alert alert-warning" role="alert">
+                Sorry {{ username }}, but this exercice does not exist. Come <a href="/student/home" class="alert-link">back</a>.
+            </div>
+        {% elseif done %}
+            <br>
+            <div class="alert alert-warning" role="alert">
+                Sorry {{ username }}, but you already did that exercice... Come <a href="/student/home" class="alert-link">back</a>.
+            </div>
+        {% else %}
+            <h1>{{ exo.title }}</h1>            
+            <p>from <span class="font-weight-bold">{{course.title}}</span></p>
+            <br>
+            <h4> Try to put this code in the right order :</h4>
+            <pre hidden id="raw_code">{{ exo.code }}</pre>
+        <br>
+        <div id="preview">
+            <div id="list" class="list-group" style="font-family: monospace;"></div>
+            <br>
+        </div>
+        <div class="text-center"> 
+            <button type="button" id="confirm" class="btn btn-primary">Confirm</button>
+        </div>
+        <div id="result"></div>
+    </div>
+    <script>
+        let order = [];
+        let sorted = [];
+        let sortable_list;
+
+        function shuffle(array) {
+            var currentIndex = array.length, temporaryValue, randomIndex;
+            while (0 !== currentIndex) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex -= 1;
+                temporaryValue = array[currentIndex];
+                array[currentIndex] = array[randomIndex];
+                array[randomIndex] = temporaryValue;
+            }
+            return array;
+        }
+
+        $(document).ready(function (e) {
+            let lines = $("#raw_code").text().split('\n');
+            let c = [];
+            let len;
+            if (lines.length >= 10) {
+                len = 10;
+            } else {
+                len = lines.length;
+            }
+
+            let code = [];
+            for (let i = 0; i < len; i++) {
+                if (lines[i].trimLeft().length != 0) {
+                    code.push(lines[i]);
+                }
+            }
+
+            for (let i = 0; i < code.length; i++) {
+                sorted.push(i);
+            }
+            let perm = sorted.map((x) => x);
+            shuffle(perm);
+    
+            for (let i = 0; i < sorted.length; i++) {
+                indent = code[i].length - code[i].trimLeft().length;
+                c[perm[i]] = '<li class="list-group-item d-flex justify-content-between align-items-center" data-id="' + i + ' " style="margin-left: ' + indent/2 + 'em;">';
+                c[perm[i]] += code[i];
+                c[perm[i]] += '<span class="badge badge-pill"></span></li>';
+            }
+            $("#list").html(c);
+            
+            let setOrder = function () {
+                let items = $("#list").children();
+                order = [];
+                for (let i = 0; i < items.length; i++) {
+                    order.push(parseInt($(items[i]).data('id')));
+                }
+            }
+
+            sortable_list = Sortable.create(list, {
+                dataIdAttr: 'data-id',
+                onSort: function (e) {
+                    setOrder();
+                }
+            });
+
+            setOrder();
+        });
+
+        let isListSorted = function () {
+            return JSON.stringify(sorted) == JSON.stringify(order);
+        }
+
+        $("#confirm").click(function (e) {
+            let correct = isListSorted();
+        
+	        sortable_list.option("disabled", "true");
+            $("#confirm").hide();
+            let alert;
+            if (correct) {
+                alert = "<div class=\"alert alert-success\" role=\"alert\">Congratulation ! No mistake. <a href=\"/student/course/{{course.id}}\" class=\"alert-link\">Go back to course.</a></div>";
+            } else {
+                alert = "<div class=\"alert alert-danger\" role=\"alert\">Oh no ! You failed... <a href=\"/student/course/{{course.id}}\" class=\"alert-link\">Go back to course.</a></div>";
+            }
+            $("#result").html("<div class=\"alert alert-dark\" role=\"alert\">Waiting for results...</div>");
+            $.post("/attempt", {'username': "{{ username }}", 'exo' : "{{ exo.id }}", 'course' : "{{course.id}}", 'success' : correct}, function (data, status){
+                let a = $("#list").children();
+                for (let i = 0; i < a.length; i++) {
+                    if (order[i] == sorted[i]) {
+                        $(a[i].childNodes[1]).text('✓');
+                        $(a[i].childNodes[1]).addClass("badge-success");
+                    } else {
+                        $(a[i].childNodes[1]).text('x');
+                        $(a[i].childNodes[1]).addClass("badge-danger");
+                    }
+                }
+                $("#result").html(alert);
+                console.log(data);
+            });   
+        });
+    </script>
+    {% endif %}
+</body>
+</html>
